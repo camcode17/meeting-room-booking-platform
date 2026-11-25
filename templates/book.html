@@ -1,0 +1,20 @@
+{% extends "base.html" %}{% block content %}
+{% if result %}{% if result.errors %}<div class="flash error">{% for e in result.errors %}{{e}}<br>{% endfor %}</div>{% endif %}
+{% if result.conflicts %}<div class="card" style="border-left:4px solid #b3261e"><h3>Cannot book - conflicts found (nothing was saved)</h3>
+<table><tr><th>Occurrence</th><th>Problem(s)</th></tr>
+{% for c in result.conflicts %}<tr><td>{{c.start}} - {{c.end[11:]}}</td><td>{% for p in c.problems %}{{p.message}}<br>{% endfor %}</td></tr>{% endfor %}</table>
+{% if result.alternatives %}<h4>Alternatives for the first conflicting date</h4>
+{% for x in result.alternatives.rooms %}<div>Other room: <b>{{x.room.name}}</b> ({{x.room.facility_name}}, cap {{x.room.capacity}})
+<a href="/book?room_id={{x.room.id}}&date={{f.date}}&start={{f.start}}&end={{f.end}}&attendees={{f.attendees}}&purpose={{f.purpose}}">use it</a></div>{% endfor %}
+{% for s in result.alternatives.slots %}<div>Same room at {{s[0][11:]}}-{{s[1][11:]}}
+<a href="/book?room_id={{f.room_id}}&date={{s[0][:10]}}&start={{s[0][11:]}}&end={{s[1][11:]}}&attendees={{f.attendees}}&purpose={{f.purpose}}">use it</a></div>{% endfor %}
+{% if not result.alternatives.rooms and not result.alternatives.slots %}<div class="small">No alternatives found for that day.</div>{% endif %}{% endif %}</div>{% endif %}{% endif %}
+<div class="card"><h3>Request a booking</h3><form method="post">
+<div>Room <select name="room_id" required><option value="">-- choose --</option>{% for r in rooms %}<option value="{{r.id}}" {{'selected' if f.room_id|string==r.id|string}}>{{r.facility_name}} / {{r.name}} (cap {{r.capacity}}){{' *approval' if r.requires_approval or r.capacity>=20}}</option>{% endfor %}</select></div>
+<div>Date <input type="date" name="date" value="{{f.date}}" required> Start <input type="time" name="start" value="{{f.start}}" required> End <input type="time" name="end" value="{{f.end}}" required></div>
+<div>Attendees <input type="number" name="attendees" min="1" value="{{f.attendees}}" style="width:70px"></div>
+<div>Purpose <input name="purpose" value="{{f.purpose}}" style="width:360px" required></div>
+<div>Portable equipment: {% for q in equipment %}<label><input type="checkbox" name="equipment" value="{{q.id}}" {{'checked' if q.id in f.equipment}}> {{q.name}} <span class="small">({{q.facility_name}})</span></label>{% endfor %}</div>
+<div>Repeat <select name="recurrence"><option value="NONE" {{'selected' if f.recurrence=='NONE'}}>Does not repeat</option><option value="DAILY" {{'selected' if f.recurrence=='DAILY'}}>Every weekday</option><option value="WEEKLY" {{'selected' if f.recurrence=='WEEKLY'}}>Weekly</option></select>
+for <input type="number" name="count" min="1" max="26" value="{{f.count}}" style="width:60px"> occurrence(s)</div>
+<button>Submit request</button></form></div>{% endblock %}

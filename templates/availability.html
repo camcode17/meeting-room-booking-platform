@@ -1,0 +1,14 @@
+{% extends "base.html" %}{% block content %}
+<div class="card"><h3>Find an available room</h3>
+<form method="get">Date <input type="date" name="date" value="{{f.date}}"> From <input type="time" name="start" value="{{f.start}}">
+To <input type="time" name="end" value="{{f.end}}"> Min capacity <input type="number" name="capacity" min="1" value="{{f.capacity}}" style="width:70px"><br>
+Equipment needed: {% for t in types %}<label><input type="checkbox" name="types" value="{{t}}" {{'checked' if t in f.types}}> {{t}}</label>{% endfor %}<br>
+<button>Search</button></form></div>
+{% if searched and rooms is not none %}
+<div class="card"><h3>Free rooms ({{rooms|length}})</h3><table><tr><th>Room</th><th>Facility</th><th>Capacity</th><th>Equipment</th><th></th></tr>
+{% for x in rooms %}<tr><td>{{x.room.name}}</td><td>{{x.room.facility_name}}</td><td>{{x.room.capacity}}</td><td>{{x.equipment_note}}</td>
+<td><a class="btn" href="/book?room_id={{x.room.id}}&date={{f.date}}&start={{f.start}}&end={{f.end}}">Book</a></td></tr>
+{% else %}<tr><td colspan="5">No rooms match.</td></tr>{% endfor %}</table></div>
+<div class="card"><h3>Portable equipment in this period</h3><table><tr><th>Item</th><th>Type</th><th>Facility</th><th>Status</th></tr>
+{% for i in items %}<tr><td>{{i.item.name}}</td><td>{{i.item.type}}</td><td>{{i.item.facility_name}}</td><td>{{'Free' if i.free else 'Reserved / unavailable'}}</td></tr>{% endfor %}</table></div>{% endif %}
+{% endblock %}

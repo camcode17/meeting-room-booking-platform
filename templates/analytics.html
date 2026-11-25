@@ -1,0 +1,12 @@
+{% extends "base.html" %}{% block content %}
+<div class="card"><form method="get">From <input type="date" name="from" value="{{d_from}}"> To <input type="date" name="to" value="{{d_to}}"> <button>Update</button></form>
+<p>Total bookings: <b>{{r.total_bookings}}</b> | Cancellation rate: <b>{{r.overall_cancel_rate}}%</b> | Average utilization: <b>{{r.avg_util}}%</b>
+<span class="small">(available hours per room in range: {{r.available_hours}})</span></p></div>
+<div class="card"><h3>Room utilization</h3><table><tr><th>Room</th><th>Facility</th><th>Utilization</th><th>Hours</th><th>Bookings</th><th>Cancel %</th><th>Insight</th></tr>
+{% for x in r.rooms %}<tr><td>{{x.name}}</td><td>{{x.facility}}</td><td style="width:220px"><div class="bar"><i style="width:{{ [x.util,100]|min }}%"></i></div>{{x.util}}%</td>
+<td>{{x.hours}}</td><td>{{x.bookings}}</td><td>{{x.cancel_rate}}</td><td>{{x.label}}</td></tr>{% endfor %}</table></div>
+<div class="grid"><div class="card"><h3>Peak hours (bookings in progress)</h3><table>{% set mx = (r.by_hour.values()|max) or 1 %}
+{% for h,v in r.by_hour.items() %}<tr><td>{{'%02d'|format(h)}}:00</td><td style="width:70%"><div class="bar"><i style="width:{{100*v/mx}}%"></i></div></td><td>{{v}}</td></tr>{% endfor %}</table></div>
+<div class="card"><h3>Busiest weekdays</h3><table>{% set mx2 = (r.by_day.values()|max) or 1 %}
+{% for d,v in r.by_day.items() %}<tr><td>{{d}}</td><td style="width:70%"><div class="bar"><i style="width:{{100*v/mx2}}%"></i></div></td><td>{{v}}</td></tr>{% endfor %}</table>
+<h3>Portable equipment usage</h3><table>{% for q in r.equipment %}<tr><td>{{q.name}}</td><td>{{q.uses}}</td></tr>{% endfor %}</table></div></div>{% endblock %}

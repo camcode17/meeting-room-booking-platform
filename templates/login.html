@@ -1,0 +1,4 @@
+{% extends "base.html" %}{% block content %}
+<div class="card"><h2>Demo login</h2><p class="small">Pick who you want to act as (no passwords in this demo). Different roles see different menus.</p>
+<form method="post"><select name="employee_id">{% for e in employees %}<option value="{{e.id}}">{{e.name}} - {{e.role}}</option>{% endfor %}</select>
+<button>Enter</button></form></div>{% endblock %}

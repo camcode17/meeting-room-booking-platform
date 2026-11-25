@@ -1,0 +1,30 @@
+{% extends "base.html" %}{% block content %}
+<div class="grid">
+<div class="card"><h3>Add facility</h3><form method="post" action="/admin/facility"><input name="name" placeholder="Name" required><input name="location" placeholder="Location" required><input name="type" placeholder="Type" required><input name="capacity" type="number" placeholder="Capacity"><button>Add</button></form></div>
+<div class="card"><h3>Add room</h3><form method="post" action="/admin/room"><select name="facility_id">{% for f in facilities %}<option value="{{f.id}}">{{f.name}}</option>{% endfor %}</select>
+<input name="name" placeholder="Room name" required><input name="floor" placeholder="Floor" style="width:60px"><input name="capacity" type="number" placeholder="Capacity" required style="width:90px">
+<input name="max_hours" type="number" value="8" style="width:60px"> max h <label><input type="checkbox" name="requires_approval"> needs approval</label><button>Add</button></form></div>
+<div class="card"><h3>Add equipment</h3><form method="post" action="/admin/equipment"><input name="name" placeholder="Name" required><input name="type" placeholder="Type (Projector...)" required>
+<select name="facility_id">{% for f in facilities %}<option value="{{f.id}}">{{f.name}}</option>{% endfor %}</select>
+<select name="room_id"><option value="">Portable (reservable)</option>{% for r in rooms %}<option value="{{r.id}}">Fixed in {{r.name}}</option>{% endfor %}</select><button>Add</button></form></div>
+<div class="card"><h3>Add employee</h3><form method="post" action="/admin/employee"><input name="name" placeholder="Name" required><input name="email" placeholder="Email" required>
+<select name="role"><option>EMPLOYEE</option><option>MANAGER</option><option>FACILITY_ADMIN</option></select>
+<select name="manager_id"><option value="">No manager</option>{% for e in employees if e.role=='MANAGER' %}<option value="{{e.id}}">{{e.name}}</option>{% endfor %}</select><button>Add</button></form></div>
+</div>
+<div class="card"><h3>Block a room / equipment (maintenance or blocked slot)</h3><form method="post" action="/admin/block">
+<select name="room_id"><option value="">-- room --</option>{% for r in rooms %}<option value="{{r.id}}">{{r.name}}</option>{% endfor %}</select> or
+<select name="equipment_id"><option value="">-- equipment --</option>{% for q in equipment %}<option value="{{q.id}}">{{q.name}}</option>{% endfor %}</select>
+<select name="kind"><option>MAINTENANCE</option><option>BLOCKED</option></select>
+<input type="date" name="date" required><input type="time" name="start" required><input type="time" name="end" required><input name="reason" placeholder="Reason"><button>Block</button></form>
+<table><tr><th>What</th><th>Period</th><th>Kind</th><th>Reason</th></tr>{% for m in blocks %}<tr><td>{{m.room_name or m.equipment_name}}</td><td>{{m.start_time}} to {{m.end_time}}</td><td>{{m.kind}}</td><td>{{m.reason}}</td></tr>{% endfor %}</table></div>
+<div class="card"><h3>Rooms</h3><table><tr><th>Room</th><th>Facility</th><th>Cap</th><th>Rules</th><th>Status</th><th></th></tr>
+{% for r in rooms %}<tr><td>{{r.name}}</td><td>{{r.facility_name}}</td><td>{{r.capacity}}</td><td>max {{r.max_hours}}h{{', approval' if r.requires_approval}}</td><td>{{r.status}}</td>
+<td><form method="post" action="/admin/status"><input type="hidden" name="table" value="rooms"><input type="hidden" name="id" value="{{r.id}}"><button>Toggle</button></form></td></tr>{% endfor %}</table></div>
+<div class="card"><h3>Equipment</h3><table><tr><th>Name</th><th>Type</th><th>Facility</th><th>Location</th><th>Status</th><th></th></tr>
+{% for q in equipment %}<tr><td>{{q.name}}</td><td>{{q.type}}</td><td>{{q.facility_name}}</td><td>{{ q.room_name or 'portable' }}</td><td>{{q.status}}</td>
+<td><form method="post" action="/admin/status"><input type="hidden" name="table" value="equipment"><input type="hidden" name="id" value="{{q.id}}"><button>Toggle</button></form></td></tr>{% endfor %}</table></div>
+<div class="card"><h3>Facilities</h3><table><tr><th>Name</th><th>Location</th><th>Type</th><th>Status</th><th></th></tr>
+{% for f in facilities %}<tr><td>{{f.name}}</td><td>{{f.location}}</td><td>{{f.type}}</td><td>{{f.status}}</td>
+<td><form method="post" action="/admin/status"><input type="hidden" name="table" value="facilities"><input type="hidden" name="id" value="{{f.id}}"><button>Toggle</button></form></td></tr>{% endfor %}</table></div>
+<div class="card"><h3>Employees</h3><table><tr><th>Name</th><th>Email</th><th>Role</th><th>Manager</th></tr>{% for e in employees %}<tr><td>{{e.name}}</td><td>{{e.email}}</td><td>{{e.role}}</td><td>{{e.manager_name or '-'}}</td></tr>{% endfor %}</table></div>
+{% endblock %}

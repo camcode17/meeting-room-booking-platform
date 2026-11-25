@@ -1,0 +1,9 @@
+{% extends "base.html" %}{% block content %}
+<div class="card"><h3>Pending approvals</h3>
+<table><tr><th>Requester</th><th>Room</th><th>When</th><th>Why approval?</th><th>Decision</th></tr>
+{% for x in queue %}{% set a=x.a %}<tr><td>{{a.requester}}</td><td>{{a.room_name}} ({{a.attendees}} ppl)</td>
+<td>{{a.start_time}} - {{a.end_time[11:]}}{% if x.count>1 %}<br><span class="small">series of {{x.count}} - decision applies to all</span>{% endif %}<br>{{a.purpose}}</td>
+<td>{{a.reason}}<br><span class="small">routed to {{a.approver_role}}</span></td>
+<td><form method="post" action="/approvals/{{a.booking_id}}"><input name="comment" placeholder="comment">
+<button class="green" name="decision" value="approve">Approve</button> <button class="red" name="decision" value="reject">Reject</button></form></td></tr>
+{% else %}<tr><td colspan="5">Nothing waiting for you.</td></tr>{% endfor %}</table></div>{% endblock %}

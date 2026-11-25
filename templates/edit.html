@@ -1,0 +1,13 @@
+{% extends "base.html" %}{% block content %}
+{% if result %}{% if result.errors %}<div class="flash error">{% for e in result.errors %}{{e}}<br>{% endfor %}</div>{% endif %}
+{% if result.conflicts %}<div class="card" style="border-left:4px solid #b3261e"><h3>Cannot apply change - conflicts (booking left unchanged)</h3>
+{% for c in result.conflicts %}{% for p in c.problems %}<div>{{p.message}}</div>{% endfor %}{% endfor %}
+{% if result.alternatives %}{% for x in result.alternatives.rooms %}<div>Other room: <b>{{x.room.name}}</b> (cap {{x.room.capacity}})</div>{% endfor %}
+{% for s in result.alternatives.slots %}<div>Same room free {{s[0][11:]}}-{{s[1][11:]}}</div>{% endfor %}{% endif %}</div>{% endif %}{% endif %}
+<div class="card"><h3>Change booking #{{bid}}</h3><p class="small">Changes are re-checked for conflicts and may need approval again.</p><form method="post">
+<div>Room <select name="room_id">{% for r in rooms %}<option value="{{r.id}}" {{'selected' if f.room_id|string==r.id|string}}>{{r.facility_name}} / {{r.name}} (cap {{r.capacity}})</option>{% endfor %}</select></div>
+<div>Date <input type="date" name="date" value="{{f.date}}"> Start <input type="time" name="start" value="{{f.start}}"> End <input type="time" name="end" value="{{f.end}}"></div>
+<div>Attendees <input type="number" name="attendees" min="1" value="{{f.attendees}}" style="width:70px"></div>
+<div>Purpose <input name="purpose" value="{{f.purpose}}" style="width:360px"></div>
+<div>Portable equipment: {% for q in equipment %}<label><input type="checkbox" name="equipment" value="{{q.id}}" {{'checked' if q.id in f.equipment}}> {{q.name}}</label>{% endfor %}</div>
+<button>Save changes</button> <a href="/bookings">Back</a></form></div>{% endblock %}

@@ -1,0 +1,11 @@
+{% extends "base.html" %}{% block content %}
+<div class="card"><h3>{{ 'All bookings' if show_all else 'My bookings' }}</h3>
+{% if user.role=='FACILITY_ADMIN' %}<a href="/bookings{{ '' if show_all else '?all=1' }}">{{ 'Show only mine' if show_all else 'Show everyone\'s' }}</a>{% endif %}
+<table><tr><th>When</th><th>Room</th><th>By</th><th>Purpose</th><th>Equipment</th><th>Status</th><th></th></tr>
+{% for b in bookings %}<tr><td>{{b.start_time}} - {{b.end_time[11:]}}</td><td>{{b.facility_name}} / {{b.room_name}}</td><td>{{b.employee_name}}</td>
+<td>{{b.purpose}}{% if b.recurrence_group %} <span class="small">(series)</span>{% endif %}</td><td>{{b.equipment_names or '-'}}</td>
+<td><span class="tag {{b.status}}">{{b.status}}</span></td>
+<td>{% if b.status in ('PENDING','APPROVED') and b.start_time > now and (b.employee_id==user.id or user.role=='FACILITY_ADMIN') %}
+<a class="btn" href="/bookings/{{b.id}}/edit">Edit</a> <form method="post" action="/bookings/{{b.id}}/cancel" style="display:inline"><button class="red">Cancel</button>
+{% if b.recurrence_group %}<button class="red" name="series" value="1">Cancel series</button>{% endif %}</form>{% endif %}</td></tr>
+{% else %}<tr><td colspan="7">No bookings.</td></tr>{% endfor %}</table></div>{% endblock %}

@@ -1,0 +1,5 @@
+{% extends "base.html" %}{% block content %}
+<div class="card"><h3>Audit history (latest 300)</h3><form method="get">Entity <select name="entity"><option value="">all</option>
+{% for e in ['booking','room','facility','equipment','employee','maintenance'] %}<option>{{e}}</option>{% endfor %}</select><button>Filter</button></form>
+<table><tr><th>Time</th><th>User</th><th>Entity</th><th>Action</th><th>Details</th></tr>
+{% for a in rows %}<tr><td>{{a.timestamp}}</td><td>{{a.user_name or '-'}}</td><td>{{a.entity}} #{{a.entity_id}}</td><td>{{a.action}}</td><td>{{a.details}}</td></tr>{% endfor %}</table></div>{% endblock %}

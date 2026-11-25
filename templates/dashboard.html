@@ -1,0 +1,8 @@
+{% extends "base.html" %}{% block content %}
+<div class="card"><h2>Hello, {{ user.name }}</h2>
+{% if user.role != 'EMPLOYEE' %}<p>Requests awaiting your decision: <b>{{ pending }}</b> <a href="/approvals">open queue</a></p>{% endif %}
+<a class="btn" href="/book">New booking</a> <a class="btn" href="/availability">Check availability</a></div>
+<div class="card"><h3>Your upcoming bookings</h3>
+<table><tr><th>When</th><th>Room</th><th>Purpose</th><th>Status</th></tr>
+{% for b in upcoming %}<tr><td>{{b.start_time}} - {{b.end_time[11:]}}</td><td>{{b.room_name}}</td><td>{{b.purpose}}</td><td><span class="tag {{b.status}}">{{b.status}}</span></td></tr>
+{% else %}<tr><td colspan="4">Nothing upcoming.</td></tr>{% endfor %}</table></div>{% endblock %}
